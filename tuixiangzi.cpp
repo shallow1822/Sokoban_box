@@ -7,12 +7,12 @@
 #include<mmsystem.h>
 #pragma comment(lib,"Winmm.lib")
 #define Width 15
-#define Hight 15
+#define Hight 10
 #define Blank 0
 #define Wall 1
 #define Target 2
 #define Box 3
-//#define RightBox 4
+#define LuckyDog 4
 #define StarX 6
 #define StarY 5
 #define B_SIZE 60
@@ -21,6 +21,7 @@ void DrawMap();
 void Move(int xMove, int yMove);
 int judge();
 void gotoxy(int x, int y);
+void begin();
 void music_move();
 void music_win();
 void music_main1();
@@ -35,43 +36,67 @@ void music_get();
 void music_lose();
 void music_loseclose();
 void music_fail();
-//void music_target();
 int esc; 
 int score=0;
-int i = 1;
-int j = 1;
-int map[Hight][Width] = {
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,1,0,3,0,2,0,0,0,0,0,3,0,1},
-	{1,0,3,0,0,3,2,1,0,0,1,0,1,0,1},
-	{1,3,1,0,0,0,2,0,0,0,0,0,0,0,1}, 
-	{1,0,0,0,1,0,3,0,0,0,0,0,0,0,1},
-	{1,2,0,0,0,0,0,1,0,0,0,0,0,0,1},
-	{1,1,1,1,1,1,0,0,0,3,0,0,0,0,1},
-	{1,0,0,2,0,0,0,0,0,1,0,0,3,0,1},
-	{1,0,0,0,0,0,0,0,3,0,0,0,0,0,1},
-	{1,0,0,1,1,1,2,1,0,0,2,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
-	{1,0,2,0,3,0,1,0,0,2,0,0,2,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-};
-int boxmap[Hight][Width];
+int a, b;
 int x, y;
 char input;
+int get=0;
+int map[Hight][Width];
+int boxmap[Hight][Width];
+int totalmap[][Hight][Width] = { 
+	{
+	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,1,0,3,0,2,0,0,3,1,1,0,0,1},
+	{1,0,0,0,0,3,2,1,0,0,0,0,0,0,1},
+	{1,3,1,0,0,0,2,0,0,0,1,1,2,0,1},
+	{1,0,0,0,1,0,3,0,0,1,1,2,1,0,1},
+	{1,2,0,0,0,0,0,1,0,0,0,0,3,0,1},
+	{1,1,1,1,1,1,3,0,0,1,1,3,0,0,1},
+	{1,0,0,2,0,0,0,0,0,2,0,0,0,0,1},
+	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	},
+	{ 
+	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,1,3,1,0,2,0,0,3,0,0,0,0,1},
+	{1,0,0,0,0,3,2,1,0,0,1,1,0,1,1},
+	{1,3,1,1,0,0,2,0,0,0,1,0,0,2,1},
+	{1,0,0,0,1,0,3,0,0,1,1,2,1,0,1},
+	{1,2,0,0,1,0,0,1,0,0,0,0,3,0,1},
+	{1,1,1,0,1,1,3,0,0,1,1,3,0,0,1},
+	{1,0,0,2,0,0,0,0,0,2,0,0,0,0,1},
+	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	},
+	{ 
+	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+	{4,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,1,0,3,0,0,0,0,3,1,1,0,0,1},
+	{1,0,0,3,0,1,2,1,0,0,0,0,0,0,1},
+	{1,3,1,1,1,1,2,0,0,0,1,1,2,0,1},
+	{1,0,0,0,1,0,3,0,0,1,1,2,1,0,1},
+	{1,2,0,0,0,0,0,1,0,0,0,0,3,0,1},
+	{1,1,1,1,1,1,3,0,0,1,1,3,0,0,1},
+	{1,0,0,2,0,0,0,0,0,2,0,0,0,0,1},
+	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+	}
+};
+
 int main()
 {
+	input1:
 	music_main1();
+//return_:
 	clock_t star, end;
 	star = clock();
 	system("color fc");
 	InitMap();
 	//PlaySound(TEXT("Spark.wav"), NULL, SND_FILENAME | SND_ASYNC);
 	//msuic_lose();
-	while (!judge())
+	while (1)
 	{
-
+		judge();
 		gotoxy(0,0);
 		DrawMap();
 		FlushBatchDraw();
@@ -95,6 +120,20 @@ int main()
 		if (input == 27) {
 			esc = 1;
 		}
+		if (input == 'r') {
+			system("cls");
+			printf("\n");
+			system("cls");
+			printf("\t\t\t\t\t还想玩嘛??\n");
+			printf("\t\t\t\t\tㄟ(▔▽▔ㄟ) (╯▔▽▔)╯\n");
+			printf("\t\t\t\t\t继续按：C\n\n\n");
+			printf("\t\t\t\t\t退出按：Esc");
+			int input1 = _getch();
+			if (input1 == 'c') {
+				goto input1;
+			}
+			//goto return_;
+		}
 		if (input == '1') {
 			music_main1();
 		}
@@ -106,38 +145,42 @@ int main()
 			music_main1close();
 		}
 		if (input == '3') {
-			if (i % 2 != 0) {
+			if (a % 2 != 0) {
 				music_main1stop();
-				++i;
+				++a;
 			}
-			else if (i % 2 == 0) {
+			else if (a % 2 == 0) {
 				music_main1continue();
-				++i;
+				++a;
 			}
 		}
 		if (input == '5') {
 			music_main2close();
 		}
 		if (input == '6') {
-			if (j % 2 != 0) {
+			if (b % 2 != 0) {
 				music_main2stop();
-				++j;
+				++b;
 			}
-			else if (j % 2 == 0) {
+			else if (b % 2 == 0) {
 				music_main2continue();
-				++j;
+				++b;
 			}
 		}
 		if (input == '0') {
 			music_loseclose();
 		}
 		Sleep(75);
+		if (judge()) {
+			DrawMap();
+			break;
+		}
 	}
 	EndBatchDraw();
 	end = clock();
 	float time = (double)(end - star) / CLOCKS_PER_SEC;
 	int time1 = (int)time;
-	if (score == 10) {
+	if (score == 16||score==9) {
 		music_loseclose();
 		music_main1close();
 		music_main2close();
@@ -152,7 +195,18 @@ int main()
 		outtextxy(10, 60, s);
 		printf("太厉害了吧 time=%f\n", time);
 		printf("\n----YOU WIN-----\n");
-		printf("%d",score);
+		//printf("%d", score);
+		printf("\n");
+		//system("cls");
+		printf("\t\t\t\t\t还想玩嘛??\n");
+		printf("\t\t\t\t\tㄟ(▔▽▔ㄟ) (╯▔▽▔)╯\n");
+		printf("\t\t\t\t\t继续按：C\n\n\n");
+		printf("\t\t\t\t\t退出按：回车");
+		int input1 = _getch();
+		system("cls");
+		if (input1 == 'c') {
+			goto input1;
+		}
 	}
 	else {
 		music_loseclose();
@@ -170,17 +224,19 @@ int main()
 		outtextxy(10, 60, s);
 		printf("\n----YOU FAIL!!-----\n");
 		printf("time=%f\n",time);
-		printf("%d", score);
-		
+		//printf("%d", score);
+
 	}
-	printf("\n");
+
+	getchar();//begin函数里接收回车
 	getchar();
 	return 0;
 }
 void InitMap() {
 	int i, j;
+	begin();
 	initgraph(1000, 1000);
-	setorigin(50, 50);
+	setorigin(50, 150);
 	//setaspectratio(1, 1);
 	setbkcolor(RGB(255, 225, 255));
 	BeginBatchDraw();
@@ -201,6 +257,9 @@ void InitMap() {
 			if (map[i][j] == Target) {
 				boxmap[i][j] = Target;
 			}
+			if (map[i][j] == LuckyDog) {
+				boxmap[i][j] = LuckyDog;
+			}
 		}
 	}
 }
@@ -215,12 +274,37 @@ void DrawMap()
 		{
 			if (i == x && j == y)
 			{
-				setfillcolor(RGB(55, 125, 34));
-				setlinecolor(RGB(150, 150, 150));
-				fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+				if(i % 2 == 0) {
+					if (j % 2 == 0) {
+						setfillcolor(RGB(105, 224, 69));
+						setlinecolor(RGB(150, 150, 150));
+						fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+					
+					}
+					else {
+						setfillcolor(RGB(117, 249, 77));
+						setlinecolor(RGB(150, 150, 150));
+						fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+						
+					}
+				}
+			else {
+				if ((j + 1) % 2 == 0) {
+					setfillcolor(RGB(105, 224, 69));
+					setlinecolor(RGB(150, 150, 150));
+					fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+					
+				}
+				else {
+					setfillcolor(RGB(117, 249, 77));
+					setlinecolor(RGB(150, 150, 150));
+					fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+				}
+			}
 				//脸
-				setlinecolor(RGB(150, 150, 150));
-				setfillcolor(RGB(240,135,132));
+				//setlinestyle(PS_ENDCAP_ROUND, 1);
+				//setlinecolor(BLACK);
+				setfillcolor(RGB(240,134,80));
 				fillcircle((j + 0.5) * B_SIZE, (i + 0.5) * B_SIZE, 0.4 * B_SIZE);
 				//右眼
 				setlinecolor(RGB(240, 135, 132));
@@ -252,7 +336,7 @@ void DrawMap()
 				setfillcolor(RGB(120, 67, 21));
 				fillroundrect((j+0.1)*B_SIZE, (i + 0.2) * B_SIZE, (j+0.9)*B_SIZE, (i + 0.4) * B_SIZE,B_SIZE*0.3,B_SIZE*0.1);
 				//上层帽
-				setlinestyle(PS_ENDCAP_ROUND, 1);
+				setlinestyle(PS_DASH, 2);
 				setlinecolor(BLACK);
 				setfillcolor(RGB(120,63,12));
 				fillrectangle((j + 0.15) * B_SIZE, (i) * B_SIZE, (j + 0.85) * B_SIZE, (i + 0.2) * B_SIZE);
@@ -263,7 +347,7 @@ void DrawMap()
 			{
 				if (boxmap[i][j] == Box) 
 				{
-					if (map[i][j] == Target) 
+					if (map[i][j] == Target|| map[i][j] == LuckyDog)
 					{
 						setlinecolor(BLACK);
 						setfillcolor(YELLOW);
@@ -277,16 +361,16 @@ void DrawMap()
 					}
 					else
 					{
-						setfillcolor(RGB(120, 67, 10));
+						setfillcolor(RGB(240, 134, 80));
 						setlinecolor(BLACK);
 						fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
-						setfillcolor(RGB(120, 67, 10));
+						setfillcolor(RGB(240, 134, 80));
 						setlinecolor(BLACK);
 						fillrectangle((j+0.1) * B_SIZE, (i+0.1) * B_SIZE, (j + 0.9) * B_SIZE, (i + 0.9) * B_SIZE);
-						setfillcolor(RGB(120,67,21));
+						setfillcolor(RGB(240,134,80));
 						setlinecolor(BLACK);
 						fillrectangle((j+0.2) * B_SIZE, (i+0.2) * B_SIZE, (j + 0.8) * B_SIZE, (i + 0.8) * B_SIZE);
-						setfillcolor(RGB(120, 67, 21));
+						setfillcolor(RGB(240, 134, 80));
 						setlinecolor(BLACK);
 						fillrectangle((j+0.3) * B_SIZE, (i+0.3) * B_SIZE, (j+0.7)  * B_SIZE, (i+0.7) * B_SIZE);
 						printf("o");
@@ -297,11 +381,38 @@ void DrawMap()
 					switch (map[i][j])
 					{
 					case Blank:
-						setfillcolor(RGB(55, 125, 34));
-						setlinecolor(RGB(150, 150, 150));
-						fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
-						printf(" ");
-						break;
+						if (i % 2 == 0) {
+							if (j % 2 == 0) {
+								setfillcolor(RGB(105, 224, 69));
+								setlinecolor(RGB(150, 150, 150));
+								fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+								printf(" ");
+								break;
+							}
+							else {
+								setfillcolor(RGB(117, 249, 77));
+								setlinecolor(RGB(150, 150, 150));
+								fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+								printf(" ");
+								break;
+							}
+						}
+						else {
+							if ((j + 1) % 2 == 0) {
+								setfillcolor(RGB(105, 224, 69));
+								setlinecolor(RGB(150, 150, 150));
+								fillrectangle(j* B_SIZE, i* B_SIZE, (j + 1)* B_SIZE, (i + 1)* B_SIZE);
+								printf(" ");
+								break;
+							}
+							else {
+								setfillcolor(RGB(117, 249, 77));
+								setlinecolor(RGB(150, 150, 150));
+								fillrectangle(j* B_SIZE, i* B_SIZE, (j + 1)* B_SIZE, (i + 1)* B_SIZE);
+								printf(" ");
+								break;
+							}
+						}
 					case Wall:
 						setfillcolor(BLACK);
 						setlinecolor(RGB(150, 150, 150));
@@ -309,13 +420,44 @@ void DrawMap()
 						printf("#");
 						break;
 					case Target:
-						setfillcolor(RGB(55, 125, 34));
-						setlinecolor(RGB(150, 150, 150));
-						fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+						if (i % 2 == 0) {
+							if (j % 2 == 0) {
+								setfillcolor(RGB(105, 224, 69));
+								setlinecolor(RGB(150, 150, 150));
+								fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+							
+							}
+							else {
+								setfillcolor(RGB(117, 249, 77));
+								setlinecolor(RGB(150, 150, 150));
+								fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+							
+							}
+						}
+						else {
+							if ((j + 1) % 2 == 0) {
+								setfillcolor(RGB(105, 224, 69));
+								setlinecolor(RGB(150, 150, 150));
+								fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+						
+							}
+							else {
+								setfillcolor(RGB(117, 249, 77));
+								setlinecolor(RGB(150, 150, 150));
+								fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+								
+							}
+						}
 						setfillcolor(WHITE); 
 						setlinecolor(BLACK);
 						fillrectangle((j + 0.3) * B_SIZE, (i + 0.3) * B_SIZE,(j + 0.7) * B_SIZE, (i + 0.7) * B_SIZE);
 						printf("T");
+						break;
+					case LuckyDog:
+						setfillcolor(BLACK);
+						setlinecolor(RGB(150, 150, 150));
+						fillrectangle(j * B_SIZE, i * B_SIZE, (j + 1) * B_SIZE, (i + 1) * B_SIZE);
+						printf("#");
 						break;
 					}
 				}
@@ -393,20 +535,19 @@ void music_loseclose() {
 }
 
 void music_main1() {
-	//PlaySound(TEXT("Spark.wav"), NULL, SND_FILENAME | SND_ASYNC);
-	mciSendString("play Spark.wav ", 0, 0, 0);
+	mciSendString("play rich.wav ", 0, 0, 0);
 }
 
 void  music_main1stop() {
-	mciSendString("pause Spark.wav ", 0, 0, 0);
+	mciSendString("pause rich.wav ", 0, 0, 0);
 }
 
 void music_main1continue() {
-	mciSendString("resume Spark.wav ", 0, 0, 0);
+	mciSendString("resume rich.wav ", 0, 0, 0);
 }
 
 void music_main1close() {
-	mciSendString("close Spark.wav ", 0, 0, 0);
+	mciSendString("close rich.wav ", 0, 0, 0);
 }
 
 void music_main2() {
@@ -429,6 +570,43 @@ void music_get() {
 	mciSendString("play 到.wav ", 0, 0, 0);
 }
 
-//还没弄完
+void begin() {
+	system("cls");
+	printf("\n\n\n\n");
+	printf("\t\t\t\t\tㄟ(▔＾▔ㄟ)      \n\n\n");
+	printf("\t\t\t\t\t推箱子小游戏      \n\n\n");
+	printf("\t\t\t\t\t请选择地图:(╯▔＾▔)╯\n\n");
+	printf("\t\t\t\t\t简单：1  中等：2  困难：3\n\n");
+	printf("\t\t\t\t\t请输入：");
 
-
+pre:
+	scanf("%d",&get);
+	switch (get) {
+	case 1:
+		for (int k = 0; k < 10; k++) {
+			for (int l = 0; l < 15; l++) {
+				map[k][l] = totalmap[0][k][l];
+			}
+		}
+		break;
+	case 2:
+		for (int k = 0; k < 10; k++) {
+			for (int l = 0; l < 15; l++) {
+				map[k][l] = totalmap[1][k][l];
+			}
+		}
+		break;
+	case 3:
+		for (int k = 0; k < 10; k++) {
+			for (int l = 0; l < 15; l++) {
+				map[k][l] = totalmap[2][k][l];
+			}
+		}
+		break;
+	default:
+		printf("\t\t\t\t\t请选择正确的难度：");
+		goto pre;
+		break;
+	}
+	system("cls");
+}
